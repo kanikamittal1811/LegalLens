@@ -1,9 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { SYSTEM_PROMPT, getAnalysisPrompt } from "./prompts";
 import { DocumentAnalysis } from "./schemas";
+import { sanitizeTextField } from "../security/validation";
 
-// In a real app, instantiate this with an API key from env vars.
-// We assume GOOGLE_GENAI_API_KEY is set in the environment.
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GENAI_API_KEY });
 
 export async function analyzeDocumentText(
@@ -14,9 +13,6 @@ export async function analyzeDocumentText(
   const prompt = getAnalysisPrompt(text, documentType, jurisdiction);
 
   try {
-    console.log(`[Gemini] Sending ${text.length} chars to gemini-3.1-flash-lite...`);
-    const startTime = Date.now();
-    
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-lite",
       contents: prompt,
@@ -26,22 +22,18 @@ export async function analyzeDocumentText(
       },
     });
 
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-    console.log(`[Gemini] Response received in ${elapsed}s`);
-
     const jsonString = response.text || "{}";
-    console.log(`[Gemini] Response length: ${jsonString.length} chars`);
     const analysis: DocumentAnalysis = JSON.parse(jsonString);
     return analysis;
   } catch (error) {
-    console.error("[Gemini] Error analyzing document:", error);
+    console.error("[Gemini] Error analyzing document:", error instanceof Error ? error.message : "Unknown error");
     throw new Error("Failed to analyze document");
   }
 }
 
 /**
  * Analyze a document by sending the raw file bytes directly to Gemini.
- * Gemini natively supports PDF parsing, so no need for pdf-parse.
+ * Gemini natively supports PDF parsing.
  */
 export async function analyzeDocumentBuffer(
   buffer: Buffer,
@@ -51,8 +43,10 @@ export async function analyzeDocumentBuffer(
   jurisdiction: string
 ): Promise<DocumentAnalysis> {
   const base64Data = buffer.toString("base64");
+  const safeDocType = sanitizeTextField(documentType, 100, "Legal Document");
+  const safeJurisdiction = sanitizeTextField(jurisdiction, 100, "not specified");
 
-  const promptText = `Analyze this legal document (${documentType}, jurisdiction: ${jurisdiction || "not specified"}).
+  const promptText = `Analyze this legal document (${safeDocType}, jurisdiction: ${safeJurisdiction}).
   
 Return a JSON object with:
 - "summary": array of plain-English bullet points summarizing the key points
@@ -90,8 +84,7 @@ Return a JSON object with:
     const analysis: DocumentAnalysis = JSON.parse(jsonString);
     return analysis;
   } catch (error) {
-    console.error("Error analyzing document:", error);
+    console.error("[Gemini] Error analyzing document buffer:", error instanceof Error ? error.message : "Unknown error");
     throw new Error("Failed to analyze document");
   }
 }
-

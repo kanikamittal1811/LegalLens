@@ -2,10 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
 // Mock dependencies with vi.hoisted
-const { mockGenerateContent, mockOnce, mockRef } = vi.hoisted(() => ({
+const { mockGenerateContent, mockOnce, mockRef, mockVerifyIdToken } = vi.hoisted(() => ({
   mockGenerateContent: vi.fn(),
   mockOnce: vi.fn(),
   mockRef: vi.fn(),
+  mockVerifyIdToken: vi.fn(),
 }));
 
 vi.mock('@google/genai', () => ({
@@ -20,6 +21,9 @@ vi.mock('@/lib/firebase/admin', () => ({
   adminDb: {
     ref: (...args: unknown[]) => mockRef(...args),
   },
+  adminAuth: {
+    verifyIdToken: (...args: unknown[]) => mockVerifyIdToken(...args),
+  },
 }));
 
 import { POST } from './route';
@@ -30,6 +34,7 @@ describe('POST /api/chat', () => {
     mockRef.mockReturnValue({
       once: mockOnce,
     });
+    mockVerifyIdToken.mockResolvedValue({ uid: 'user-99' });
   });
 
   it('returns 400 if documentId or message is missing', async () => {
@@ -45,6 +50,22 @@ describe('POST /api/chat', () => {
     expect(json.error).toBe('Missing documentId or message');
   });
 
+  it('returns 400 for invalid documentId format', async () => {
+    const req = new NextRequest('http://localhost:3000/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        documentId: '../bad/path',
+        message: 'Hello',
+      }),
+    });
+
+    const response = await POST(req);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json.error).toBe('Invalid document ID format');
+  });
+
   it('returns 404 if the document does not exist in Firebase', async () => {
     mockOnce.mockResolvedValueOnce({
       exists: () => false,
@@ -53,9 +74,10 @@ describe('POST /api/chat', () => {
 
     const req = new NextRequest('http://localhost:3000/api/chat', {
       method: 'POST',
+      headers: { Authorization: 'Bearer valid-user-token' },
       body: JSON.stringify({
         documentId: 'non-existent-doc',
-        userId: 'user-1',
+        userId: 'user-99',
         message: 'Can I terminate early?',
       }),
     });
@@ -108,6 +130,7 @@ Section 8.1 — Page 4`;
 
     const req = new NextRequest('http://localhost:3000/api/chat', {
       method: 'POST',
+      headers: { Authorization: 'Bearer valid-user-token' },
       body: JSON.stringify({
         documentId: 'doc-123',
         userId: 'user-99',
@@ -131,7 +154,7 @@ Section 8.1 — Page 4`;
     );
   });
 
-  it('handles exceptions and returns 500 error response', async () => {
+  it('handles exceptions and returns sanitized 500 error response', async () => {
     mockOnce.mockRejectedValueOnce(new Error('Database network timeout'));
 
     const req = new NextRequest('http://localhost:3000/api/chat', {
@@ -146,6 +169,6 @@ Section 8.1 — Page 4`;
     const json = await response.json();
 
     expect(response.status).toBe(500);
-    expect(json.error).toBe('Database network timeout');
+    expect(json.error).toContain('unexpected error occurred');
   });
 });

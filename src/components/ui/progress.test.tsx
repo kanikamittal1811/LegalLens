@@ -7,7 +7,7 @@ describe('Progress component', () => {
     render(
       <Progress value={75}>
         <ProgressLabel>Analysis Progress</ProgressLabel>
-        <ProgressValue>75%</ProgressValue>
+        <ProgressValue>{() => "75%"}</ProgressValue>
       </Progress>
     );
 

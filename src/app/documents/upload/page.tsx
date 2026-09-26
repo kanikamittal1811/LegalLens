@@ -103,8 +103,15 @@ export default function UploadPage() {
         }
       }, 2500);
 
+      const headers: Record<string, string> = {};
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        headers["Authorization"] = `Bearer ${idToken}`;
+      }
+
       const response = await fetch("/api/analyze", {
         method: "POST",
+        headers,
         body: formData,
       });
 
