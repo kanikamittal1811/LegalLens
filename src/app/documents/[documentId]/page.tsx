@@ -164,20 +164,21 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 space-y-4">
+      <div role="status" aria-live="polite" className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 space-y-4">
         <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-xl">
-          <Loader2 className="w-8 h-8 animate-spin" />
+          <Loader2 className="w-8 h-8 animate-spin" aria-hidden="true" />
         </div>
         <p className="text-sm font-medium text-slate-400">Loading document intelligence...</p>
+        <span className="sr-only">Analyzing document data</span>
       </div>
     );
   }
 
   if (!docMeta || !analysis) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-300 space-y-6 px-6 text-center">
+      <div role="alert" className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-300 space-y-6 px-6 text-center">
         <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500">
-          <FileText className="w-8 h-8" />
+          <FileText className="w-8 h-8" aria-hidden="true" />
         </div>
         <div className="space-y-2">
           <h2 className="text-2xl font-bold text-white">Document not found</h2>
@@ -212,7 +213,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans relative selection:bg-indigo-500/30 selection:text-indigo-200">
       
       {/* Background Lights */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10" aria-hidden="true">
         <div className="absolute top-0 right-1/4 w-[700px] h-[350px] bg-indigo-600/10 blur-[130px] rounded-full" />
         <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-blue-600/10 blur-[140px] rounded-full" />
       </div>
@@ -220,8 +221,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
       {/* Header */}
       <header className="px-6 lg:px-12 py-4 flex items-center justify-between glass-header sticky top-0 z-40">
         <div className="flex items-center space-x-4">
-          <Link href="/dashboard" className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all">
-            <ArrowLeft className="w-4 h-4" />
+          <Link href="/dashboard" aria-label="Back to dashboard" className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all focus-visible:ring-2 focus-visible:ring-indigo-400">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           </Link>
           
           <div className="flex flex-col">
@@ -246,14 +247,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             className="border-slate-800 bg-slate-900/80 text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/30 rounded-xl"
             onClick={handleDelete}
             disabled={isDeleting}
+            aria-label="Delete document analysis"
           >
-            <Trash2 className="w-4 h-4 mr-1.5" />
+            <Trash2 className="w-4 h-4 mr-1.5" aria-hidden="true" />
             <span className="hidden sm:inline">Delete</span>
           </Button>
           
           <Link href="/documents/upload">
             <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-xl shadow-lg shadow-indigo-500/20">
-              <Sparkles className="w-4 h-4 mr-1.5" />
+              <Sparkles className="w-4 h-4 mr-1.5" aria-hidden="true" />
               New Scan
             </Button>
           </Link>
@@ -261,10 +263,15 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8">
+      <main id="main-content" tabIndex={-1} className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 outline-none">
         
+        {/* Live region for clipboard feedback */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {copiedQuestion ? "Question copied to clipboard" : ""}
+        </div>
+
         {/* Executive Scorecard Banner */}
-        <div className="glass-panel rounded-3xl p-6 mb-8 relative overflow-hidden">
+        <section aria-label="Executive document summary scorecard" className="glass-panel rounded-3xl p-6 mb-8 relative overflow-hidden">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-800/80">
             
             {/* Risk Indicator */}
@@ -277,11 +284,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                   : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
               }`}>
                 {highPriority.length > 0 ? (
-                  <ShieldAlert className="w-6 h-6" />
+                  <ShieldAlert className="w-6 h-6" aria-hidden="true" />
                 ) : reviewItems.length > 0 ? (
-                  <AlertTriangle className="w-6 h-6" />
+                  <AlertTriangle className="w-6 h-6" aria-hidden="true" />
                 ) : (
-                  <ShieldCheck className="w-6 h-6" />
+                  <ShieldCheck className="w-6 h-6" aria-hidden="true" />
                 )}
               </div>
               <div>
@@ -297,7 +304,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             {/* Total Clauses */}
             <div className="flex items-center space-x-4 pt-4 sm:pt-0 sm:pl-6">
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shrink-0">
-                <FileText className="w-6 h-6" />
+                <FileText className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Clauses Identified</div>
@@ -308,7 +315,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             {/* Obligations */}
             <div className="flex items-center space-x-4 pt-4 sm:pt-0 sm:pl-6">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
-                <CheckSquare className="w-6 h-6" />
+                <CheckSquare className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Your Obligations</div>
@@ -319,7 +326,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             {/* Deadlines */}
             <div className="flex items-center space-x-4 pt-4 sm:pt-0 sm:pl-6">
               <div className="w-12 h-12 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0">
-                <Calendar className="w-6 h-6" />
+                <Calendar className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Dates & Deadlines</div>
@@ -328,42 +335,50 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             </div>
 
           </div>
-        </div>
+        </section>
 
         {/* 2-Column Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           
           {/* Left Navigation Sidebar */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="glass-card rounded-2xl p-3 space-y-1.5 sticky top-24">
+            <div role="tablist" aria-label="Document Sections" className="glass-card rounded-2xl p-3 space-y-1.5 sticky top-24">
               <div className="px-3 py-2 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                 Document Sections
               </div>
               
               <button
+                role="tab"
+                id="tab-overview"
+                aria-selected={activeTab === "overview"}
+                aria-controls="panel-overview"
                 onClick={() => setActiveTab("overview")}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                   activeTab === "overview"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 <span className="flex items-center">
-                  <Sparkles className="w-4 h-4 mr-2.5 text-indigo-400" />
+                  <Sparkles className="w-4 h-4 mr-2.5 text-indigo-400" aria-hidden="true" />
                   Plain-English Summary
                 </span>
               </button>
 
               <button
+                role="tab"
+                id="tab-clauses"
+                aria-selected={activeTab === "clauses"}
+                aria-controls="panel-clauses"
                 onClick={() => setActiveTab("clauses")}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                   activeTab === "clauses"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 <span className="flex items-center">
-                  <FileText className="w-4 h-4 mr-2.5 text-blue-400" />
+                  <FileText className="w-4 h-4 mr-2.5 text-blue-400" aria-hidden="true" />
                   Clauses & Risk Radar
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">
@@ -372,15 +387,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
               </button>
 
               <button
+                role="tab"
+                id="tab-obligations"
+                aria-selected={activeTab === "obligations"}
+                aria-controls="panel-obligations"
                 onClick={() => setActiveTab("obligations")}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                   activeTab === "obligations"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 <span className="flex items-center">
-                  <CheckSquare className="w-4 h-4 mr-2.5 text-emerald-400" />
+                  <CheckSquare className="w-4 h-4 mr-2.5 text-emerald-400" aria-hidden="true" />
                   Commitments & Duties
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">
@@ -389,15 +408,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
               </button>
 
               <button
+                role="tab"
+                id="tab-dates"
+                aria-selected={activeTab === "dates"}
+                aria-controls="panel-dates"
                 onClick={() => setActiveTab("dates")}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                   activeTab === "dates"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 <span className="flex items-center">
-                  <Calendar className="w-4 h-4 mr-2.5 text-purple-400" />
+                  <Calendar className="w-4 h-4 mr-2.5 text-purple-400" aria-hidden="true" />
                   Important Dates
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">
@@ -406,15 +429,19 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
               </button>
 
               <button
+                role="tab"
+                id="tab-questions"
+                aria-selected={activeTab === "questions"}
+                aria-controls="panel-questions"
                 onClick={() => setActiveTab("questions")}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                   activeTab === "questions"
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
                     : "text-slate-300 hover:bg-slate-900 hover:text-white"
                 }`}
               >
                 <span className="flex items-center">
-                  <HelpCircle className="w-4 h-4 mr-2.5 text-amber-400" />
+                  <HelpCircle className="w-4 h-4 mr-2.5 text-amber-400" aria-hidden="true" />
                   Questions for Lawyer
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">
@@ -426,7 +453,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             {/* Quick Consultation Helper Card */}
             <div className="glass-card rounded-2xl p-5 border border-indigo-500/20 bg-gradient-to-br from-indigo-950/30 to-slate-900/70 space-y-3">
               <div className="flex items-center space-x-2 text-indigo-300">
-                <Zap className="w-4 h-4 text-indigo-400" />
+                <Zap className="w-4 h-4 text-indigo-400" aria-hidden="true" />
                 <span className="text-xs font-bold uppercase tracking-wider">Negotiation Tip</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
@@ -434,9 +461,9 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
               </p>
               <button 
                 onClick={() => setActiveTab("questions")}
-                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center pt-1"
+                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center pt-1 focus-visible:ring-2 focus-visible:ring-indigo-400 rounded-sm"
               >
-                Review talking points <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                Review talking points <ChevronRight className="w-3.5 h-3.5 ml-1" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -446,12 +473,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
             
             {/* TAB: OVERVIEW */}
             {activeTab === "overview" && (
-              <div className="space-y-6 animate-fadeIn">
+              <div id="panel-overview" role="tabpanel" tabIndex={0} aria-labelledby="tab-overview" className="space-y-6 animate-fadeIn outline-none">
                 <div className="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                        <Sparkles className="w-5 h-5" />
+                        <Sparkles className="w-5 h-5" aria-hidden="true" />
                       </div>
                       <div>
                         <h2 className="text-xl font-bold text-white">30-Second Executive Summary</h2>
@@ -463,7 +490,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                   <div className="space-y-4">
                     {analysis.summary.map((point, idx) => (
                       <div key={idx} className="flex items-start space-x-3.5 p-3.5 rounded-xl bg-slate-900/50 border border-slate-800/80">
-                        <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" aria-hidden="true">
                           {idx + 1}
                         </div>
                         <p className="text-sm text-slate-200 leading-relaxed font-normal">
@@ -479,12 +506,12 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                   <div className="glass-panel rounded-3xl p-6 sm:p-8 border-rose-500/30 bg-gradient-to-br from-rose-950/20 via-slate-900/80 to-slate-950 space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 text-rose-400">
-                        <ShieldAlert className="w-5 h-5" />
+                        <ShieldAlert className="w-5 h-5" aria-hidden="true" />
                         <h3 className="font-bold text-lg text-white">Critical Risk Areas ({highPriority.length})</h3>
                       </div>
                       <button 
                         onClick={() => setActiveTab("clauses")}
-                        className="text-xs font-semibold text-rose-400 hover:text-rose-300"
+                        className="text-xs font-semibold text-rose-400 hover:text-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400 rounded-sm"
                       >
                         View all clauses →
                       </button>
@@ -510,13 +537,13 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                 {analysis.unclearInformation && analysis.unclearInformation.length > 0 && (
                   <div className="glass-panel rounded-3xl p-6 border-slate-800 bg-slate-900/60 space-y-3">
                     <div className="flex items-center space-x-2 text-slate-300">
-                      <Info className="w-4 h-4 text-amber-400" />
+                      <Info className="w-4 h-4 text-amber-400" aria-hidden="true" />
                       <h3 className="font-bold text-sm text-white">Ambiguities & Missing Details</h3>
                     </div>
                     <ul className="space-y-2">
                       {analysis.unclearInformation.map((info, idx) => (
                         <li key={idx} className="text-xs text-slate-400 flex items-start space-x-2">
-                          <span className="text-amber-400 mr-1">•</span>
+                          <span className="text-amber-400 mr-1" aria-hidden="true">•</span>
                           <span>{info}</span>
                         </li>
                       ))}
@@ -528,7 +555,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
 
             {/* TAB: CLAUSES */}
             {activeTab === "clauses" && (
-              <div className="space-y-6 animate-fadeIn">
+              <div id="panel-clauses" role="tabpanel" tabIndex={0} aria-labelledby="tab-clauses" className="space-y-6 animate-fadeIn outline-none">
                 
                 {/* Search / Filter Bar */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -536,13 +563,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                     <h2 className="text-xl font-bold text-white">Clauses & Risk Radar</h2>
                     <p className="text-xs text-slate-400">Evaluated against standard market benchmarks</p>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search clauses or keywords..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full sm:w-64 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-                  />
+                  <div className="w-full sm:w-64">
+                    <label htmlFor="clause-search" className="sr-only">Search clauses or keywords</label>
+                    <input
+                      id="clause-search"
+                      type="text"
+                      placeholder="Search clauses or keywords..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus-visible:ring-2 focus-visible:ring-indigo-400"
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -570,11 +601,11 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                         <div className="flex items-start justify-between gap-4 mb-3">
                           <div className="flex items-center space-x-2.5">
                             {isHigh ? (
-                              <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0" />
+                              <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0" aria-hidden="true" />
                             ) : isReview ? (
-                              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+                              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" aria-hidden="true" />
                             ) : (
-                              <FileText className="w-5 h-5 text-indigo-400 shrink-0" />
+                              <FileText className="w-5 h-5 text-indigo-400 shrink-0" aria-hidden="true" />
                             )}
                             <h3 className="font-bold text-base text-white">{clause.title}</h3>
                           </div>
@@ -608,7 +639,8 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="text-xs border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl cursor-pointer"
+                                  className="text-xs border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl cursor-pointer focus-visible:ring-2 focus-visible:ring-indigo-400"
+                                  aria-label={`View contract text and negotiation questions for ${clause.title}`}
                                 >
                                   View Contract Text & Questions
                                 </Button>
@@ -643,7 +675,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                                     <ul className="space-y-2">
                                       {clauseQuestions.map((q: string, qIdx: number) => (
                                         <li key={qIdx} className="text-xs text-slate-300 flex items-start space-x-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">
-                                          <span className="text-amber-400 font-bold">?</span>
+                                          <span className="text-amber-400 font-bold" aria-hidden="true">?</span>
                                           <span className="flex-1">{q}</span>
                                         </li>
                                       ))}
@@ -663,7 +695,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
 
             {/* TAB: OBLIGATIONS */}
             {activeTab === "obligations" && (
-              <div className="space-y-6 animate-fadeIn">
+              <div id="panel-obligations" role="tabpanel" tabIndex={0} aria-labelledby="tab-obligations" className="space-y-6 animate-fadeIn outline-none">
                 <div>
                   <h2 className="text-xl font-bold text-white">Your Commitments & Obligations</h2>
                   <p className="text-xs text-slate-400">Actions and duties required by the agreement</p>
@@ -673,7 +705,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                   {analysis.obligations.map((ob, idx) => (
                     <div key={idx} className="glass-panel rounded-2xl p-4 sm:p-5 flex items-start space-x-4 border-slate-800">
                       <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <CheckSquare className="w-4 h-4" />
+                        <CheckSquare className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center justify-between">
@@ -693,7 +725,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
 
             {/* TAB: DATES */}
             {activeTab === "dates" && (
-              <div className="space-y-6 animate-fadeIn">
+              <div id="panel-dates" role="tabpanel" tabIndex={0} aria-labelledby="tab-dates" className="space-y-6 animate-fadeIn outline-none">
                 <div>
                   <h2 className="text-xl font-bold text-white">Important Dates & Time Limits</h2>
                   <p className="text-xs text-slate-400">Notice periods, expiration windows, and milestones</p>
@@ -703,7 +735,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                   {analysis.deadlines.map((dl, idx) => (
                     <div key={idx} className="glass-panel rounded-2xl p-4 sm:p-5 flex items-start space-x-4 border-slate-800">
                       <div className="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex flex-col items-center justify-center shrink-0 text-center p-1">
-                        <Calendar className="w-4 h-4 mb-0.5" />
+                        <Calendar className="w-4 h-4 mb-0.5" aria-hidden="true" />
                         <span className="text-[10px] font-extrabold uppercase truncate w-full">{dl.date || dl.relativePeriod || "Date"}</span>
                       </div>
                       <div className="flex-1 space-y-1 pt-1">
@@ -717,7 +749,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
 
             {/* TAB: QUESTIONS FOR LAWYER */}
             {activeTab === "questions" && (
-              <div className="space-y-6 animate-fadeIn">
+              <div id="panel-questions" role="tabpanel" tabIndex={0} aria-labelledby="tab-questions" className="space-y-6 animate-fadeIn outline-none">
                 <div>
                   <h2 className="text-xl font-bold text-white">Questions to Ask Your Legal Counsel</h2>
                   <p className="text-xs text-slate-400">Ready-made talking points for consultations or contract negotiations</p>
@@ -737,16 +769,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                             variant="ghost"
                             size="sm"
                             onClick={() => copyToClipboard(item.question)}
-                            className="h-8 px-2.5 text-xs text-slate-400 hover:text-white rounded-lg"
+                            className="h-8 px-2.5 text-xs text-slate-400 hover:text-white rounded-lg focus-visible:ring-2 focus-visible:ring-indigo-400"
+                            aria-label={`Copy question for ${item.clause}: ${item.question}`}
                           >
                             {copiedQuestion === item.question ? (
                               <>
-                                <Check className="w-3.5 h-3.5 mr-1 text-emerald-400" />
+                                <Check className="w-3.5 h-3.5 mr-1 text-emerald-400" aria-hidden="true" />
                                 <span className="text-emerald-400">Copied</span>
                               </>
                             ) : (
                               <>
-                                <Copy className="w-3.5 h-3.5 mr-1" />
+                                <Copy className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
                                 <span>Copy</span>
                               </>
                             )}

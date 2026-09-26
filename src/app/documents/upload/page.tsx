@@ -151,29 +151,29 @@ export default function UploadPage() {
       {/* Header */}
       <header className="px-6 lg:px-12 py-4 flex items-center justify-between glass-header sticky top-0 z-50">
         <div className="flex items-center space-x-4">
-          <Link href="/dashboard" className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all">
-            <ArrowLeft className="w-4 h-4" />
+          <Link href="/dashboard" aria-label="Back to dashboard" className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all focus-visible:ring-2 focus-visible:ring-indigo-400">
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           </Link>
-          <Link href="/" className="flex items-center space-x-2.5">
+          <Link href="/" aria-label="LegalLens Home" className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-              <Scale className="w-4 h-4" />
+              <Scale className="w-4 h-4" aria-hidden="true" />
             </div>
             <span className="font-extrabold tracking-tight text-white">LegalLens</span>
           </Link>
         </div>
 
         <div className="flex items-center space-x-2 text-xs text-slate-400">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
           <span>256-Bit Encrypted Analysis</span>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-12 flex-1 w-full">
+      <main id="main-content" tabIndex={-1} className="max-w-3xl mx-auto px-6 py-12 flex-1 w-full outline-none">
         
         {/* Page Title */}
         <div className="mb-8 text-center sm:text-left">
           <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-300 mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>AI Contract Diagnostic</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -199,11 +199,11 @@ export default function UploadPage() {
               >
                 <div className="flex flex-col items-center justify-center space-y-4">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-500/20 to-blue-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-xl group-hover:scale-105 transition-transform">
-                    <FileUp className="w-10 h-10" />
+                    <FileUp className="w-10 h-10" aria-hidden="true" />
                   </div>
                   
                   <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-white">Drag & drop your document here</h3>
+                    <h2 className="text-xl font-bold text-white">Drag & drop your document here</h2>
                     <p className="text-xs sm:text-sm text-slate-400">Supports PDF, DOCX up to 15MB</p>
                   </div>
 
@@ -213,7 +213,14 @@ export default function UploadPage() {
                         Browse Files on Device
                       </div>
                     </Label>
-                    <Input id="file-upload" type="file" className="hidden" accept=".pdf,.docx" onChange={handleFileChange} />
+                    <Input 
+                      id="file-upload" 
+                      type="file" 
+                      className="sr-only" 
+                      accept=".pdf,.docx" 
+                      onChange={handleFileChange} 
+                      aria-label="Upload legal document in PDF or DOCX format"
+                    />
                   </div>
                 </div>
               </div>
@@ -223,7 +230,7 @@ export default function UploadPage() {
                 <div className="bg-indigo-950/50 p-6 flex items-center justify-between border-b border-indigo-500/20">
                   <div className="flex items-center space-x-4">
                     <div className="p-3 bg-indigo-600/30 border border-indigo-500/30 rounded-xl text-indigo-300">
-                      <FileText className="w-6 h-6" />
+                      <FileText className="w-6 h-6" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-white text-base truncate max-w-xs sm:max-w-md">{file.name}</h3>
@@ -235,27 +242,30 @@ export default function UploadPage() {
                     size="icon" 
                     className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl"
                     onClick={() => setFile(null)}
+                    aria-label={`Remove uploaded file ${file.name}`}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5" aria-hidden="true" />
                   </Button>
                 </div>
                 
                 <div className="p-6 sm:p-8 space-y-8">
                   {/* Document Type Selector */}
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2 text-slate-200">
-                      <FileType className="w-4 h-4 text-indigo-400" />
-                      <Label className="text-sm font-bold tracking-wide">Select Document Classification</Label>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  <fieldset className="space-y-3 border-0 p-0 m-0">
+                    <legend id="doc-type-label" className="flex items-center space-x-2 text-slate-200 text-sm font-bold tracking-wide mb-2">
+                      <FileType className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+                      <span>Select Document Classification</span>
+                    </legend>
+                    <div role="radiogroup" aria-labelledby="doc-type-label" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                       {DOCUMENT_TYPES.map((type) => {
                         const isSelected = docType === type;
                         return (
                           <button
                             key={type}
                             type="button"
+                            role="radio"
+                            aria-checked={isSelected}
                             onClick={() => setDocType(type)}
-                            className={`p-3 rounded-xl text-xs font-medium text-left transition-all border ${
+                            className={`p-3 rounded-xl text-xs font-medium text-left transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                               isSelected 
                                 ? "bg-indigo-600/30 border-indigo-500 text-white shadow-md shadow-indigo-500/20" 
                                 : "bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/50"
@@ -266,23 +276,25 @@ export default function UploadPage() {
                         );
                       })}
                     </div>
-                  </div>
+                  </fieldset>
 
                   {/* Jurisdiction Selector */}
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2 text-slate-200">
-                      <Globe className="w-4 h-4 text-indigo-400" />
-                      <Label className="text-sm font-bold tracking-wide">Governing Jurisdiction (Optional)</Label>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
+                  <fieldset className="space-y-3 border-0 p-0 m-0">
+                    <legend id="jurisdiction-label" className="flex items-center space-x-2 text-slate-200 text-sm font-bold tracking-wide mb-2">
+                      <Globe className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+                      <span>Governing Jurisdiction (Optional)</span>
+                    </legend>
+                    <div role="radiogroup" aria-labelledby="jurisdiction-label" className="flex flex-wrap gap-2">
                       {JURISDICTIONS.map((jur) => {
                         const isSelected = jurisdiction === jur;
                         return (
                           <button
                             key={jur}
                             type="button"
+                            role="radio"
+                            aria-checked={isSelected}
                             onClick={() => setJurisdiction(jur)}
-                            className={`px-3.5 py-2 rounded-full text-xs font-medium transition-all border ${
+                            className={`px-3.5 py-2 rounded-full text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                               isSelected 
                                 ? "bg-indigo-600 border-indigo-400 text-white shadow-md shadow-indigo-600/20" 
                                 : "bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/60"
@@ -294,8 +306,10 @@ export default function UploadPage() {
                       })}
                       <button
                         type="button"
+                        role="radio"
+                        aria-checked={jurisdiction === "Not sure"}
                         onClick={() => setJurisdiction("Not sure")}
-                        className={`px-3.5 py-2 rounded-full text-xs font-medium transition-all border ${
+                        className={`px-3.5 py-2 rounded-full text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 ${
                           jurisdiction === "Not sure" 
                             ? "bg-slate-700 border-slate-500 text-white" 
                             : "bg-slate-900/60 border-slate-800 text-slate-400 hover:text-slate-200"
@@ -304,7 +318,7 @@ export default function UploadPage() {
                         Not sure / Multi-state
                       </button>
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
                 
                 {/* Footer Buttons */}
@@ -320,8 +334,9 @@ export default function UploadPage() {
                     onClick={handleUpload} 
                     className="bg-gradient-to-r from-indigo-500 via-indigo-600 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white px-8 h-12 rounded-xl font-semibold shadow-lg shadow-indigo-500/30 border border-indigo-400/20"
                     disabled={!docType}
+                    aria-label="Start decoding document"
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
                     Decode Document
                   </Button>
                 </div>
@@ -330,42 +345,49 @@ export default function UploadPage() {
           </div>
         ) : (
           /* Processing State */
-          <div className="glass-panel rounded-3xl p-10 sm:p-14 text-center max-w-lg mx-auto shadow-2xl space-y-8">
+          <div role="status" aria-live="polite" className="glass-panel rounded-3xl p-10 sm:p-14 text-center max-w-lg mx-auto shadow-2xl space-y-8">
             <div className="relative flex items-center justify-center">
-              <div className="absolute w-28 h-28 bg-indigo-500/20 rounded-full animate-ping opacity-60" />
+              <div className="absolute w-28 h-28 bg-indigo-500/20 rounded-full animate-ping opacity-60" aria-hidden="true" />
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white flex items-center justify-center shadow-xl shadow-indigo-500/40 relative z-10">
-                <Loader2 className="w-10 h-10 animate-spin" />
+                <Loader2 className="w-10 h-10 animate-spin" aria-hidden="true" />
               </div>
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-xl font-extrabold text-white tracking-tight">{processingStatus}</h3>
+              <h2 className="text-xl font-extrabold text-white tracking-tight">{processingStatus}</h2>
               <div className="relative w-full">
-                <Progress value={progress} className="h-2.5 bg-slate-900" />
+                <Progress 
+                  value={progress} 
+                  className="h-2.5 bg-slate-900" 
+                  aria-valuenow={progress} 
+                  aria-valuemin={0} 
+                  aria-valuemax={100}
+                  aria-valuetext={`${progress}% - ${processingStatus}`} 
+                />
               </div>
               <p className="text-xs text-slate-400">{progress}% completed</p>
             </div>
 
             {/* Checklist of stages */}
-            <div className="bg-slate-900/70 p-5 rounded-2xl border border-slate-800/80 text-left space-y-3">
+            <div className="bg-slate-900/70 p-5 rounded-2xl border border-slate-800/80 text-left space-y-3" aria-label="Processing stages">
               <div className="flex items-center text-xs">
-                {progress >= 15 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" />}
+                {progress >= 15 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" aria-hidden="true" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" aria-hidden="true" />}
                 <span className={progress >= 15 ? "text-slate-200 font-medium" : "text-slate-500"}>Secure upload & OCR verification</span>
               </div>
               <div className="flex items-center text-xs">
-                {progress >= 30 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" />}
+                {progress >= 30 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" aria-hidden="true" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" aria-hidden="true" />}
                 <span className={progress >= 30 ? "text-slate-200 font-medium" : "text-slate-500"}>Extracting clause hierarchy & parties</span>
               </div>
               <div className="flex items-center text-xs">
-                {progress >= 50 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" />}
+                {progress >= 50 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" aria-hidden="true" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" aria-hidden="true" />}
                 <span className={progress >= 50 ? "text-slate-200 font-medium" : "text-slate-500"}>Flagging high-risk asymmetric terms</span>
               </div>
               <div className="flex items-center text-xs">
-                {progress >= 75 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" />}
+                {progress >= 75 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" aria-hidden="true" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" aria-hidden="true" />}
                 <span className={progress >= 75 ? "text-slate-200 font-medium" : "text-slate-500"}>Synthesizing plain-English takeaways</span>
               </div>
               <div className="flex items-center text-xs">
-                {progress >= 95 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" />}
+                {progress >= 95 ? <CheckCircle2 className="w-4 h-4 text-emerald-400 mr-3 shrink-0" aria-hidden="true" /> : <div className="w-4 h-4 rounded-full border border-slate-700 mr-3 shrink-0" aria-hidden="true" />}
                 <span className={progress >= 95 ? "text-slate-200 font-medium" : "text-slate-500"}>Building comprehensive executive report</span>
               </div>
             </div>

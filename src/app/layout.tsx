@@ -35,6 +35,9 @@ export default function RootLayout({
       className={`${jakarta.variable} ${mono.variable} ${playfair.variable} h-full antialiased selection:bg-indigo-500/20 selection:text-indigo-900`}
     >
       <body className="min-h-full flex flex-col font-sans bg-slate-950 text-slate-100 antialiased overflow-x-hidden">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         {children}
       </body>
     </html>

@@ -39,24 +39,24 @@ export default function LoginPage() {
 
       {/* Top Header */}
       <header className="px-6 py-6 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors text-xs font-medium">
-          <ArrowLeft className="w-4 h-4 mr-1" />
+        <Link href="/" className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors text-xs font-medium" aria-label="Back to LegalLens homepage">
+          <ArrowLeft className="w-4 h-4 mr-1" aria-hidden="true" />
           Back to Home
         </Link>
         <div className="flex items-center space-x-2 text-xs text-slate-500">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
           <span>Encrypted Session</span>
         </div>
       </header>
 
       {/* Main Login Card */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6">
+      <main id="main-content" tabIndex={-1} className="flex-1 flex items-center justify-center px-4 sm:px-6 outline-none">
         <div className="max-w-md w-full space-y-8">
           
           <div className="flex flex-col items-center justify-center text-center space-y-3">
-            <Link href="/" className="flex items-center space-x-3 group">
+            <Link href="/" className="flex items-center space-x-3 group" aria-label="LegalLens Home">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-blue-500 flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 group-hover:scale-105 transition-transform">
-                <Scale className="w-6 h-6" />
+                <Scale className="w-6 h-6" aria-hidden="true" />
               </div>
             </Link>
             
@@ -72,7 +72,7 @@ export default function LoginPage() {
 
           <div className="glass-panel rounded-3xl p-8 border-slate-800 shadow-2xl space-y-6">
             {error && (
-              <div className="p-3.5 bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs rounded-xl text-center">
+              <div role="alert" aria-live="assertive" className="p-3.5 bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs rounded-xl text-center">
                 {error}
               </div>
             )}
@@ -81,11 +81,12 @@ export default function LoginPage() {
               className="w-full h-13 text-sm font-semibold bg-white hover:bg-slate-100 text-slate-900 rounded-xl shadow-lg transition-all hover:scale-[1.01] flex items-center justify-center" 
               onClick={handleGoogleSignIn}
               disabled={loading}
+              aria-busy={loading}
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 mr-2 animate-spin text-slate-900" />
+                <Loader2 className="w-5 h-5 mr-2 animate-spin text-slate-900" aria-hidden="true" />
               ) : (
-                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -96,7 +97,7 @@ export default function LoginPage() {
             </Button>
 
             <div className="pt-2 text-center text-[11px] text-slate-500 leading-relaxed border-t border-slate-800/80">
-              By proceeding, you agree to LegalLens&apos;s <span className="text-slate-400 underline cursor-pointer">Terms of Service</span> and <span className="text-slate-400 underline cursor-pointer">Privacy Policy</span>.
+              By proceeding, you agree to LegalLens&apos;s <Link href="/terms" className="text-slate-400 hover:text-white underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded-sm">Terms of Service</Link> and <Link href="/privacy" className="text-slate-400 hover:text-white underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded-sm">Privacy Policy</Link>.
             </div>
           </div>
         </div>

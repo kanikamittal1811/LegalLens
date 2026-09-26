@@ -92,6 +92,48 @@
   }
 }
 
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid #818cf8 !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip Navigation Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #4f46e5;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  z-index: 9999;
+  text-decoration: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 0 2px #818cf8;
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
+}
+
+/* Screen Reader Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Glassmorphism & Visual Aesthetics */
 .glass-header {
   background: rgba(11, 17, 32, 0.82);
@@ -216,4 +258,20 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.6);
+}
+
+/* Reduced Motion Support (WCAG 2.2 AAA / AA) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .shimmer-badge::after {
+    animation: none !important;
+  }
 }
