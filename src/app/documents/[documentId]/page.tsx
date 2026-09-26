@@ -23,7 +23,8 @@ import {
   Zap
 } from "lucide-react";
 import { ref, get, remove } from "firebase/database";
-import { db } from "@/lib/firebase/client";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "@/lib/firebase/client";
 import { useRouter } from "next/navigation";
 import { DocumentAnalysis, Clause, Obligation, Deadline } from "@/lib/ai/schemas";
 
@@ -83,12 +84,21 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
-        const userId = "anonymous";
-        const docRef = ref(db, `users/${userId}/documents/${documentId}`);
-        const snapshot = await get(docRef);
+        const userId = user ? user.uid : "anonymous";
+        let docRef = ref(db, `users/${userId}/documents/${documentId}`);
+        let snapshot = await get(docRef);
         
+        // If not found in user's space, check anonymous fallback
+        if (!snapshot.exists()) {
+          const anonRef = ref(db, `users/anonymous/documents/${documentId}`);
+          const anonSnap = await get(anonRef);
+          if (anonSnap.exists()) {
+            snapshot = anonSnap;
+          }
+        }
+
         if (!snapshot.exists()) {
           setLoading(false);
           return;
@@ -128,15 +138,16 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
       } finally {
         setLoading(false);
       }
-    }
-    fetchData();
+    });
+
+    return () => unsubscribe();
   }, [documentId]);
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this document analysis?")) return;
     try {
       setIsDeleting(true);
-      const userId = "anonymous";
+      const userId = auth.currentUser ? auth.currentUser.uid : "anonymous";
       await remove(ref(db, `users/${userId}/documents/${documentId}`));
       router.push("/dashboard");
     } catch (err) {

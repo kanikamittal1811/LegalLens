@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -13,10 +14,14 @@ import {
   ShieldAlert, 
   CheckCircle2, 
   Search, 
-  Plus
+  Plus,
+  LogOut,
+  User as UserIcon,
+  Loader2
 } from "lucide-react";
 import { ref, get } from "firebase/database";
-import { db } from "@/lib/firebase/client";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { auth, db } from "@/lib/firebase/client";
 import { Clause } from "@/lib/ai/schemas";
 
 interface DocumentItem {
@@ -28,16 +33,27 @@ interface DocumentItem {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    async function loadDocs() {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // If not logged in, redirect to login page
+        router.push("/login");
+        return;
+      }
+
+      setCurrentUser(user);
+
       try {
-        const userId = "anonymous";
+        const userId = user.uid;
         const userDocsRef = ref(db, `users/${userId}/documents`);
         const snap = await get(userDocsRef);
+        
         if (snap.exists()) {
           const val = snap.val() as Record<string, Omit<DocumentItem, "id">>;
           const docList: DocumentItem[] = Object.entries(val).map(([id, data]) => ({
@@ -45,21 +61,40 @@ export default function DashboardPage() {
             ...data
           }));
           setDocuments(docList.reverse());
+        } else {
+          setDocuments([]);
         }
       } catch (e) {
         console.error("Error loading dashboard docs:", e);
       } finally {
         setLoading(false);
       }
-    }
-    loadDocs();
-  }, []);
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push("/login");
+  };
 
   const filteredDocs = documents.filter(doc => {
     if (!search) return true;
     const q = search.toLowerCase();
     return (doc.name || "").toLowerCase().includes(q) || (doc.documentType || "").toLowerCase().includes(q);
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-100 space-y-4">
+        <div className="w-16 h-16 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-xl">
+          <Loader2 className="w-8 h-8 animate-spin" />
+        </div>
+        <p className="text-sm font-medium text-slate-400">Loading your secure workspace...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative selection:bg-indigo-500/30 selection:text-indigo-200">
@@ -92,10 +127,24 @@ export default function DashboardPage() {
               Upload Document
             </Button>
           </Link>
-          <Avatar className="h-8 w-8 border border-slate-700 cursor-pointer">
-            <AvatarImage src="" />
-            <AvatarFallback className="bg-indigo-950 text-indigo-300 font-bold text-xs">U</AvatarFallback>
-          </Avatar>
+
+          <div className="flex items-center space-x-3 pl-2 border-l border-slate-800">
+            <Avatar className="h-8 w-8 border border-slate-700">
+              <AvatarImage src={currentUser?.photoURL || ""} />
+              <AvatarFallback className="bg-indigo-950 text-indigo-300 font-bold text-xs">
+                {currentUser?.displayName?.[0]?.toUpperCase() || currentUser?.email?.[0]?.toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 p-2 h-8 rounded-lg"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -108,7 +157,7 @@ export default function DashboardPage() {
             <div className="space-y-3 max-w-xl">
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-300">
                 <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Executive Legal Workspace</span>
+                <span>Executive Legal Workspace • {currentUser?.email || "Personal Vault"}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Review & Decode Contracts with Total Confidence
@@ -131,11 +180,11 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="glass-card rounded-2xl p-6 space-y-2 border-slate-800">
             <div className="flex items-center justify-between text-slate-400">
-              <span className="text-xs font-bold uppercase tracking-wider">Documents Analyzed</span>
+              <span className="text-xs font-bold uppercase tracking-wider">Your Documents</span>
               <FileText className="w-4 h-4 text-indigo-400" />
             </div>
             <div className="text-3xl font-extrabold text-white">{documents.length}</div>
-            <p className="text-xs text-slate-500">Processed in secure vault</p>
+            <p className="text-xs text-slate-500">Authenticated user vault</p>
           </div>
 
           <div className="glass-card rounded-2xl p-6 space-y-2 border-slate-800">
@@ -177,15 +226,13 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          {loading ? (
-            <div className="p-12 text-center text-slate-500">Loading documents...</div>
-          ) : filteredDocs.length === 0 ? (
+          {documents.length === 0 ? (
             <div className="glass-panel rounded-3xl p-12 text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 mx-auto">
                 <FileText className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-white">No documents uploaded yet</h3>
+                <h3 className="text-base font-bold text-white">No documents in your vault yet</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
                   Upload your first contract or agreement to see the AI report and risk breakdown.
                 </p>

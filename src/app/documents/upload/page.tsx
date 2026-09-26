@@ -21,6 +21,8 @@ import {
   FileType
 } from "lucide-react";
 
+import { auth } from "@/lib/firebase/client";
+
 const DOCUMENT_TYPES = [
   "Employment Agreement", 
   "Rental / Lease", 
@@ -81,7 +83,8 @@ export default function UploadPage() {
       formData.append("file", file);
       formData.append("documentType", docType);
       formData.append("jurisdiction", jurisdiction || "General");
-      formData.append("userId", "anonymous");
+      const currentUser = auth.currentUser;
+      formData.append("userId", currentUser ? currentUser.uid : "anonymous");
 
       const steps = [
         { at: 25, msg: "Extracting legal text & structure..." },
