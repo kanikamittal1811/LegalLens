@@ -101,10 +101,11 @@ export async function POST(req: NextRequest) {
       documentId: docId,
       analysis,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Analysis Error:", error);
+    const message = error instanceof Error ? error.message : "An error occurred during analysis";
     return NextResponse.json(
-      { error: error.message || "An error occurred during analysis" },
+      { error: message },
       { status: 500 }
     );
   }

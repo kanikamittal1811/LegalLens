@@ -16,7 +16,6 @@ import {
   Search, 
   Plus,
   LogOut,
-  User as UserIcon,
   Loader2
 } from "lucide-react";
 import { ref, get } from "firebase/database";

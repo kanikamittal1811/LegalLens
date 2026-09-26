@@ -87,7 +87,7 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       try {
         const userId = user ? user.uid : "anonymous";
-        let docRef = ref(db, `users/${userId}/documents/${documentId}`);
+        const docRef = ref(db, `users/${userId}/documents/${documentId}`);
         let snapshot = await get(docRef);
         
         // If not found in user's space, check anonymous fallback

@@ -23,7 +23,12 @@ export async function POST(req: NextRequest) {
 
     const docData = snapshot.val();
     const clausesMap = docData.clauses || {};
-    const clauses = Object.values(clausesMap) as any[];
+    const clauses = Object.values(clausesMap) as Array<{
+      title?: string;
+      originalText?: string;
+      section?: string;
+      page?: string | number;
+    }>;
 
     // 2. Build context from clauses (Simple MVP Retrieval)
     // In MVP, we just feed all important clauses as context to avoid complex embeddings
@@ -78,10 +83,11 @@ export async function POST(req: NextRequest) {
       success: true,
       reply: response.text,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Chat Error:", error);
+    const message = error instanceof Error ? error.message : "An error occurred during chat generation";
     return NextResponse.json(
-      { error: error.message || "An error occurred during chat generation" },
+      { error: message },
       { status: 500 }
     );
   }
