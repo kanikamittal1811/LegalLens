@@ -592,15 +592,17 @@ export default function DocumentAnalysisPage({ params }: { params: Promise<{ doc
                         {/* Original Text & Questions Modal Trigger */}
                         <div className="flex justify-end pt-2 border-t border-slate-800/60">
                           <Dialog>
-                            <DialogTrigger asChild>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                className="text-xs border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl"
-                              >
-                                View Contract Text & Questions
-                              </Button>
-                            </DialogTrigger>
+                            <DialogTrigger
+                              render={
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  className="text-xs border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 rounded-xl cursor-pointer"
+                                >
+                                  View Contract Text & Questions
+                                </Button>
+                              }
+                            />
                             <DialogContent className="sm:max-w-[650px] bg-slate-900 border-slate-800 text-slate-100 p-6 rounded-2xl">
                               <DialogHeader>
                                 <DialogTitle className="text-lg font-bold text-white">{clause.title}</DialogTitle>
